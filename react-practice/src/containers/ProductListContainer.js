@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import ProductList from "../components/ProductList";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -6,29 +6,42 @@ import axios from "axios";
 function ProductListContainer() {
   const dispatch = useDispatch();
   const products = useSelector((state) => state);
+
+  const fetchProducts = async () => {
+
+    let result = {
+      res:null,
+      error:null,
+      loading:true
+    }
+    try {
+      result.res = await axios.get(
+        "https://cdn.contentful.com/spaces/cbrojnj5jk1h/entries",
+        {
+          params: {
+            access_token: `_fGCFUtl6cCaO8W7dBoEvkBS2kyUJFVtECd6TqFiNDw`,
+            content_type: "product",
+          },
+        }
+      );
+    } catch (err) {
+      result.error = err;
+    }
+    result.loading = false;
+    console.log('feteched result', result);
+    dispatch({ type: "fetchProducts", result: result });
+  };
   
   useEffect(() => {
     fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-        try {
-      const result = await axios.get('https://cdn.contentful.com/spaces/cbrojnj5jk1h/entries', {
-        params: {
-          access_token: `_fGCFUtl6cCaO8W7dBoEvkBS2kyUJFVtECd6TqFiNDw`,
-          content_type: 'product',
-        },
-      });
-      dispatch({ type: "fetchProducts", items: result?.data?.items ?? [] });
-    } catch (err) {
-    }
-  };
-
-  console.log(products);
+  },[]);
 
   return (
     <div>
-      <ProductList products={products.products} onFetchProducts={fetchProducts} />
+      <ProductList
+        products={products.products}
+        onFetchProducts={fetchProducts}
+      />
     </div>
   );
 }

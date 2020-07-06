@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
 
-function rootReducer(state = { products: [] }, action) {
+function rootReducer(state = { products: { res: null, err: null, loading: true} }, action) {
   switch (action.type) {
     case "fetchProducts":
-      return { ...state, products: action.items };
+        console.log('check', action.result);
+      return { ...state, products: action.result };
     default:
       return state;
   }
